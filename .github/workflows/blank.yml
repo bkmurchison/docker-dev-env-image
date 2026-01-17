@@ -42,5 +42,5 @@ jobs:
       - name: Run Trivy vulnerability scanner
         run: |
           echo "Scanning docker-image"
-          trivy image --exit-code 0 --severity CRITICAL devimage:latest
+          trivy image --exit-code 1 --severity CRITICAL devimage:latest
           trivy image --exit-code 0 --severity HIGH,MEDIUM devimage:latest
