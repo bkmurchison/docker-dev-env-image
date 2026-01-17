@@ -33,7 +33,7 @@ RUN wget -O tofu.zip https://github.com/opentofu/opentofu/releases/download/v${O
     rm tofu.zip
 
 RUN curl -LO "https://dl.k8s.io/release/v$KUBECTL_VERSION/bin/linux/amd64/kubectl" && \
-    chmod +x kubectl && \
+    chmod u+x kubectl && \
     mv kubectl /usr/local/bin/
 
 RUN pipx install ansible-core==${ANSIBLE_VERSION}
