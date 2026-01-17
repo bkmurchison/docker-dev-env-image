@@ -1,36 +1,46 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Docker Image Scan with Trivy
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    paths:
+      - 'Dockerfile'
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - 'Dockerfile'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  scan:
+    name: Scan Docker Image
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Build image
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          docker build -t devimage:latest .
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -q0 - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/dev $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+
+      - name: Run Trivy vulnerability scanner
+        run: |
+          echo "Scanning docker-image"
+          trivy image --exit-code 1 --severity CRITICAL devimage:latest
+          trivy image --exit-code 0 --severity HIGH,MEDIUM devimage:latest
