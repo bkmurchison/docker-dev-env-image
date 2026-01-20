@@ -11,19 +11,18 @@ ENV TERRAFORM_VERSION=1.5.7 \
 WORKDIR /workspace
 
 RUN apk add --no-cache \
-    curl \
     bash \
+    curl \
     git  \
-    wget \
     unzip \
-    make \
-    build-base \
+    openssh-client \
     py3-pip \
     pipx \
-    openssh-client \
+    build-base \
     gnupg \
-    libc6-compat && \
-    curl -L -o terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/           terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    libc6-compat \
+    make && \
+    curl -L -o terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
     unzip terraform.zip && \
     mv terraform /usr/local/bin/ && \
     rm terraform.zip && \
@@ -35,9 +34,9 @@ RUN apk add --no-cache \
     chmod u+x kubectl && \
     mv kubectl /usr/local/bin/ && \
     pipx install ansible-core==${ANSIBLE_VERSION} && \
-    curl -L -o go$GOLANG_VERSION.linux-amd64.tar.gz https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go$GOLANG_VERSION.linux-amd64.tar.gz && \
-    rm go$GOLANG_VERSION.linux-amd64.tar.gz && \
+    curl -L -o go$GOLANG_VERSION.tar.gz https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go$GOLANG_VERSION.tar.gz && \
+    rm go$GOLANG_VERSION.tar.gz && \
     ln -s /usr/local/go/bin/go /usr/local/bin/go && \
     ln -s /usr/local/go/bin/gofmt /usr/local/bin/gofmt && \
     rm -rf /root/.cache
